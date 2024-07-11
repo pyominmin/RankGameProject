@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="rank.game.repository.mybatis.GameRankMapper">
+    <resultMap id="GameHistoryResultMap" type="rank.game.dto.GameHistoryDTO">
+        <result property="id" column="id"/>
+        <result property="gameId" column="game_id"/>
+        <result property="gameName" column="game_name"/>
+        <result property="gameVote" column="game_vote"/>
+        <result property="gameRank" column="game_rank"/>
+        <result property="voteTime" column="vote_time"/>
+        <result property="ranking" column="ranking"/>
+        <result property="totalVotes" column="total_votes"/>
+    </resultMap>
+
+    <select id="getRankedGames" resultMap="GameHistoryResultMap">
+        SELECT NULL AS id, game_id, game_name, NULL AS game_vote, NULL AS game_rank, NULL AS vote_time, ranking, total_votes
+        FROM (
+                 SELECT *, RANK() OVER (ORDER BY total_votes DESC) AS ranking
+                 FROM (
+                          SELECT
+                              g.id AS game_id,
+                              g.game_name,
+                              SUM(gh.game_vote) AS total_votes
+                          FROM
+                              game_history gh
+                                  JOIN
+                              games g ON gh.game_id = g.id
+                          GROUP BY
+                              g.id, g.game_name
+                      ) AS game_totals
+             ) AS ranked_games
+        ORDER BY ranking;
+    </select>
+
+
+
+
+</mapper>
