@@ -2541,7 +2541,8 @@ ol {
 }
 
 
-/*vote*/
+
+
 /* Styles for the grid container */
 .grid-container {
 	padding: 2900px 0 3500px 0;
@@ -2549,7 +2550,7 @@ ol {
 	display: flex;
 	flex-direction: column;
 	max-height: 80vh;
-	background-color: whitesmoke;
+	background-color: #48265b;
 }
 
 .grid {
@@ -2565,17 +2566,26 @@ ol {
 	border-radius: 8px;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	overflow: hidden;
-	height: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between; /* Ensure content is spaced evenly */
+	height: 350px; /* Fixed height for consistency */
+	padding: 20px;
 }
 
 .card img {
 	width: 100%;
 	height: auto;
+	object-fit: cover; /* Ensure image covers the area */
 }
 
 .card-content {
-	padding: 15px;
-	position: relative; /* Position relative to align checkbox */
+	text-align: center;
+	flex: 1; /* Ensure it takes up available space */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 }
 
 .card-content h3 {
@@ -2593,6 +2603,7 @@ ol {
 	height: 40px;
 	color: white;
 	cursor: pointer;
+	margin-top: 20px;
 }
 
 .checkbox-label input[type="checkbox"] {
@@ -2634,7 +2645,7 @@ ol {
 	border-radius: 4px;
 }
 
-.top{
+.top {
 	padding-bottom: 60px;
 }
 
@@ -2730,4 +2741,430 @@ ol {
 	background-color: purple;
 	font-size: 20px;
 	font-weight: 400;
+}
+
+/* 전적검색 */
+/* style.css */
+.Game {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background: #1e2027;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.Game--Result-WIN .deco {
+    background: #5383e8;
+}
+
+.Game--Result-LOSS .deco {
+    background: #e85353;
+}
+
+.deco {
+    width: 8px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.contents {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-left: 8px;
+}
+
+.inner {
+    display: flex;
+    flex-direction: column;
+}
+
+.css-1mk3mai.ezr8g462 {
+    display: flex;
+    justify-content: space-between;
+}
+
+.head-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.game-type, .result, .length, .avg-tier, .time-stamp div {
+    color: #fff;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 8px 0;
+}
+
+.css-e10jb3.ezr8g463 {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 0;
+}
+
+.main {
+    display: flex;
+}
+
+.info {
+    display: flex;
+    align-items: center;
+}
+
+.champion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #fff;
+}
+
+.champion img {
+    border-radius: 50%;
+    margin-bottom: 4px;
+}
+
+.champion-level {
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.GameLoadout.css-k2lqdb.eva4ivy0 {
+    display: flex;
+    flex-direction: column;
+    margin-left: 8px;
+}
+
+.loadout-group {
+    display: flex;
+    margin-bottom: 4px;
+}
+
+.spell, .rune {
+    margin-right: 4px;
+}
+
+.spell img, .rune img {
+    border-radius: 4px;
+}
+
+.kda-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 16px;
+}
+
+.kda {
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.kda-ratio {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.game-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 16px;
+}
+
+.p-kill, .ward, .cs, .avg-tier {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 4px;
+}
+
+.sub {
+    display: flex;
+    flex-direction: column;
+}
+
+.items {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.item {
+    margin-right: 4px;
+    margin-bottom: 4px;
+}
+
+.item img {
+    border-radius: 4px;
+}
+
+.trinket img {
+    border-radius: 50%;
+}
+
+.game-tags__scroll-container {
+    display: flex;
+    overflow-x: auto;
+    margin-top: 8px;
+}
+
+.game-tags {
+    display: flex;
+}
+
+.OPScoreBadge.css-1mkftr3.e10be1gk0 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(83, 131, 232, 0.2);
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin-right: 4px;
+    color: #5383e8;
+    font-size: 12px;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-detail {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.svg-icon.svg-icon--arrow-down.css-zmp1xi.exna8sm0 {
+    color: rgb(83, 131, 232);
+    width: 24px;
+    height: 24px;
+}
+
+.css-mt0u67.eour1kh0 {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.css-pp7uqb.eour1kh1 {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+.icon img {
+    border-radius: 50%;
+}
+
+.name {
+    margin-left: 4px;
+}
+
+.summoner-tooltip a {
+    text-decoration: none;
+    color: #5383e8;
+}
+
+.css-12ijbdy.e1swkqyq0 {
+    display: flex;
+    align-items: center;
+}
+
+.css-ao94tw.e1swkqyq1 {
+    font-size: 14px;
+}
+
+.record-container {
+    padding: 20px;
+    background-color: #2c2f36;
+    border-radius: 10px;
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.divider-line {
+    border-top: 1px solid white; /* 흰색 선 */
+    margin: 10px 0; /* 위아래 여백 조정 */
+}
+
+/* 프로필 */
+.profile{
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #48265b;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.profile-container {
+    max-width: 400px;
+    width: 100%;
+	height: 600px;
+    padding: 2rem;
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+  }
+
+  .profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    justify-content: center;
+  }
+
+  .avatar {
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 1rem;
+  }
+
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .profile-name {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .profile-username {
+    margin: 0;
+    color: #6b7280;
+  }
+
+  .profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    width: 100%; /* 전체 너비로 확장 */
+  }
+
+  .detail-item {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    width: 100%; /* 전체 너비로 확장 */
+  }
+
+  .detail-title {
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  .detail-value,
+  .bir_yy,
+  .bir_mm,
+  .bir_dd {
+    width: calc(100% - 1rem); /* 전체 너비로 확장하되 패딩을 감안하여 줄임 */
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    background-color: #fff;
+    color: #333;
+    font-size: 1rem;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 0.5rem; /* 아래에 여백 추가 */
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+
+  .detail-value:hover,
+  .bir_yy:hover,
+  .bir_mm:hover,
+  .bir_dd:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+  }
+
+  .bir_yy,
+  .bir_dd {
+    flex: 1;
+    margin-right: 0.5rem; /* 항목들 사이에 간격 추가 */
+  }
+
+  .bir_mm {
+    flex: 2;
+  }
+
+  #bir_wrap {
+    display: flex;
+    justify-content: space-between;
+    width: 100%; /* 전체 너비로 확장 */
+  }
+
+  .save-button {
+    background-color: #1f2937;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s ease-in-out;
+    margin-top: 100px;
+  }
+
+  .save-button:hover {
+    background-color: #111827;
+  }
+.delete-form {
+	margin-top: 20px;
+	display: flex;
+	justify-content: center;
+}
+
+.delete-button {
+	background-color: #ff4d4d;
+	border: none;
+	color: #fff;
+	padding: 10px 40px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 16px;
+	margin-top: 30px;
+}
+
+.delete-button:hover {
+	background-color: #ff1a1a;
+	border-radius: 4px;
 }

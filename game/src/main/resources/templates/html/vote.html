@@ -116,8 +116,8 @@
 <section class="grid-container content">
 	<div class="container">
 		<div class="top">
-			<h2>게임에 투표해 주세요</h2>
-			<p>투표는 5개까지 가능</p>
+			<h2 style="color: white">게임에 투표해 주세요</h2>
+			<p style="color: white">투표는 5개까지 가능</p>
 		</div>
 		<form th:action="@{/vote}" method="post">
 			<div class="grid">
@@ -126,11 +126,11 @@
 					<div class="card-content">
 						<h3 th:text="${game.gameName}">Game Name</h3>
 						<input type="hidden" name="gameName" th:value="${game.gameName}"/>
-						<label class="checkbox-label">
-							<input type="checkbox" name="selectedGames" th:value="${game.gameName}"/>
-							<span>선택</span>
-						</label>
 					</div>
+					<label class="checkbox-label">
+						<input type="checkbox" name="selectedGames" th:value="${game.gameName}"/>
+						<span>선택</span>
+					</label>
 				</div>
 			</div>
 			<div class="submit-container">

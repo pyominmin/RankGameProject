@@ -56,4 +56,40 @@ public class MemberService {
             return null;
         }
     }
+
+    public void updateMemberInfo(String memberEmail, String memberNickname, String memberPassword) {
+        // 로그 출력
+        log.info("Updating member info for email: {}", memberEmail);
+        log.info("New Nickname: {}", memberNickname);
+
+        // 이메일을 기준으로 회원 정보 조회
+        MemberEntity member = memberRepository.findByMemberEmail(memberEmail)
+                .orElseThrow(() -> new IllegalArgumentException("No member found with email: " + memberEmail));
+
+
+        // 닉네임 업데이트
+        if (memberNickname != null && !memberNickname.isEmpty()) {
+            member.setNickname(memberNickname);
+        }
+
+        if (memberPassword != null && !memberPassword.isEmpty()) {
+            member.setMemberPassword(passwordEncoder.encode(memberPassword));
+        }
+
+        // 업데이트된 회원 정보 저장
+        memberRepository.save(member);
+    }
+
+    public void deleteMember(String memberEmail) {
+        Optional<MemberEntity> member = memberRepository.findByMemberEmail(memberEmail);
+
+        if (member.isPresent()) {
+            // Delete the member
+            memberRepository.delete(member.get());
+            log.info("Member with email {} has been deleted.", memberEmail);
+        } else {
+            // Throw an exception if the member is not found
+            throw new IllegalArgumentException("회원 정보를 찾을 수 없습니다.");
+        }
+    }
 }

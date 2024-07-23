@@ -56,7 +56,7 @@
 				<nav class="top-nav-area w-100">
 					<div class="user-panel">
 						<div class="auth" th:if="${isLogin}">
-							<a href="/mypage">마이페이지</a> /
+							<a href="/profile/myPage">마이페이지</a> /
 							<a href="/member/logout">로그아웃</a>
 							<span th:if="${isAdmin != null and isAdmin}"><a href="/admin">관리자 페이지</a></span>
 						</div>

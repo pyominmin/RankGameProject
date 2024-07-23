@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import rank.game.dto.MatchDTO;
 import rank.game.dto.PlayerDTO;
 import rank.game.service.RiotApiService;
 
@@ -39,12 +40,10 @@ public class LolApiController {
 
     @PostMapping("/sorted-players")
     public String getSortedPlayers(@RequestParam String searchLOL, HttpSession session, Model model) {
-
         // 로그인 세션 추가
         boolean isLogin = session.getAttribute("loginEmail") != null;
         model.addAttribute("isLogin", isLogin);
 
-        System.out.println("sas" + searchLOL)       ;
         // searchLOL 파라미터에서 gameName과 tagLine을 분리
         String[] parts = searchLOL.split("#");
         if (parts.length != 2) {
@@ -66,6 +65,10 @@ public class LolApiController {
             session.setAttribute("puuid", playerInfo.getPuuid());
             session.setAttribute("tier", playerInfo.getTier());
 
+            // 매치 데이터 가져오기
+            List<MatchDTO> matches = riotApiService.getMatchesByPuuid(playerInfo.getPuuid());
+            model.addAttribute("matches", matches); // 모델에 매치 데이터 추가
+
             // 최근 검색어를 세션에 저장
             List<String> recentSearches = (List<String>) session.getAttribute("recentSearches");
             if (recentSearches == null) {
@@ -86,6 +89,7 @@ public class LolApiController {
             model.addAttribute("puuid", playerInfo.getPuuid());
             model.addAttribute("tier", playerInfo.getTier());
 
+            log.info("플레이어 정보가 세션 및 모델에 추가되었습니다.");
             // leagueOfLegends 뷰 반환
             return "html/searchLOL";
         } else {
@@ -97,7 +101,6 @@ public class LolApiController {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public String handleIllegalArgumentException(IllegalArgumentException e, Model model, HttpSession session) {
-
         // 로그인 세션 추가
         boolean isLogin = session.getAttribute("loginEmail") != null;
         model.addAttribute("isLogin", isLogin);
@@ -108,8 +111,7 @@ public class LolApiController {
     }
 
     @PostMapping("/member")
-    public String searchMember(HttpSession session, Model model){
-
+    public String searchMember(HttpSession session, Model model) {
         // 로그인 세션 추가
         boolean isLogin = session.getAttribute("loginEmail") != null;
         model.addAttribute("isLogin", isLogin);
@@ -127,9 +129,15 @@ public class LolApiController {
             model.addAttribute("tagLine", tagLine);
             model.addAttribute("puuid", puuid);
             model.addAttribute("tier", tier);
+
+            // 매치 데이터 가져오기
+            List<MatchDTO> matches = riotApiService.getMatchesByPuuid(playerInfo.getPuuid());
+            model.addAttribute("matches", matches); // 모델에 매치 데이터 추가
+
             return "html/searchLOL";
         } else {
-            model.addAttribute("error", "No player information found in sessi   on.");
+            model.addAttribute("error", "세션에서 플레이어 정보를 찾을 수 없습니다.");
+            log.warn("세션에서 플레이어 정보를 찾을 수 없습니다.");
             return "error";
         }
     }
