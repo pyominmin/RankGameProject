@@ -29,9 +29,11 @@
   <script src="/https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
   <script src="/https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
-
+  <style>
+    .hidden { display: none; }
+  </style>
 </head>
-<body>
+<body style="background-color: #48265b">
 <!-- Page Preloder -->
 <div id="preloder">
   <div class="loader"></div>
@@ -108,39 +110,80 @@
     <h2>게임랭킹</h2>
     <div class="site-breadcrumb">
       <a href="/">홈</a>  /
-      <span>투표</span>
+      <span>마이페이지</span>
     </div>
   </div>
 </section>
 <!-- Page top end-->
 
-<!-- 폼, POST 메서드 사용 -->
-
-  <div class="profile">
-  <div class="profile-container">
-    <div class="profile-header">
-      <div class="profile-info">
-        <!-- 회원 이름 표시 -->
-        <h1 class="profile-name" th:text="${memberName}">회원 이름</h1>
-        <p class="profile-username" th:text="${memberEmail}">@jpalmz</p>
-      </div>
+<div class="profile">
+  <div class="profile-header">
+    <div class="profile-info">
+      <!-- 회원 정보 표시 -->
+      <p class="profile-detail"><strong>이름:</strong> <span th:text="${memberName}">회원 이름</span></p>
+      <p class="profile-detail"><strong>이메일:</strong> <span th:text="${memberEmail}">이메일</span></p>
+      <p class="profile-detail"><strong>닉네임:</strong> <span th:text="${memberNickname}">닉네임</span></p>
     </div>
+  </div>
+  <div class="edit-icon" id="edit-profile-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 9l6 6 6-6"></path>
+    </svg>
+  </div>
+
+  <div class="profile-edit-form" id="profile-edit-form" style="display: none;">
+    <form action="/profile/change" method="post">
       <div class="detail-item">
-        <label class="detail-title" for="nickname">닉네임</label>
+        <label class="detail-title" for="nickname">닉네임 변경</label>
         <input class="detail-value" id="nickname" name="memberNickname" type="text" th:value="${memberNickname}" placeholder="닉네임">
       </div>
-    <form action="/profile/change" method="post">
-    <div class="detail-item">
-      <label class="detail-title" for="nickname">비밀번호 변경</label>
-      <input class="detail-value" id="memberPassword" name="memberPassword" type="password" th:value="${memberPassword}" placeholder="비밀번호 변경">
-    </div>
-    <button class="save-button" type="submit">변경사항 저장</button>
+      <div class="detail-item">
+        <label class="detail-title" for="memberPassword">비밀번호 변경</label>
+        <input class="detail-value" id="memberPassword" name="memberPassword" type="password" th:value="${memberPassword}" placeholder="비밀번호 변경">
+      </div>
+      <button class="save-button" type="submit">변경사항 저장</button>
     </form>
     <form action="/profile/delete" method="post" class="delete-form">
       <button class="delete-button" type="submit">탈퇴</button>
     </form>
   </div>
+</div>
+
+
+<div class="profile-page mx-auto px-4 py-8 sm:px-6 lg:px-8">
+  <h2 class="text-2xl font-bold mb-4">My Posts</h2>
+  <div class="space-y-4" th:each="post : ${posts}">
+    <div class="bg-white rounded-lg shadow p-4">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-medium" th:text="${post.title}">Awesome Game Review</h3>
+        <span class="text-sm text-gray-500" th:text="${post.date}">2023-04-15</span>
+      </div>
+      <p class="text-gray-600" th:text="${post.content}">Check out my in-depth review of the latest game release. You won't want to miss this!</p>
+    </div>
   </div>
+</div>
+
+<div class="profile-page mx-auto px-4 py-8 sm:px-6 lg:px-8">
+  <h2 class="text-2xl font-bold mb-4">투표한 게임 리스트</h2>
+  <div class="votes-container" id="votes-container">
+    <div class="vote-item" th:each="vote, iterStat : ${votes}" th:classappend="${iterStat.index >= 15} ? 'hidden' : ''">
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-lg font-medium" th:text="${vote.gameName}">Retro Arcade Comeback</h3>
+          <span class="text-sm text-gray-500" th:text="${vote.voteTime}">2023-05-01</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="load-more-icon" id="load-more-button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 9l6 6 6-6"></path>
+    </svg>
+  </div>
+</div>
+
+
+
 
 <!-- Footer section -->
 <footer class="footer-section">
@@ -182,6 +225,44 @@
 <script src="/js/jquery.sticky-sidebar.min.js"></script>
 <script src="/js/jquery.magnific-popup.min.js"></script>
 <script src="/js/main.js"></script>
+<script>
+  document.getElementById('edit-profile-btn').addEventListener('click', function() {
+    var form = document.getElementById('profile-edit-form');
+    if (form.style.display === 'none') {
+      form.style.display = 'block';
+    } else {
+      form.style.display = 'none';
+    }
+  });
 
+  document.getElementById('load-more-button').addEventListener('click', function() {
+    var button = document.getElementById('load-more-button');
+    var hiddenVotes = document.querySelectorAll('.vote-item.hidden');
+    var visibleVotes = document.querySelectorAll('.vote-item:not(.hidden)');
+    var totalVotes = document.querySelectorAll('.vote-item').length;
+
+    if (button.classList.contains('expanded')) {
+      // 접기
+      for (var i = 0; i < visibleVotes.length; i++) {
+        if (i >= 15) {
+          visibleVotes[i].classList.add('hidden');
+        }
+      }
+      button.classList.remove('expanded');
+      button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>';
+    } else {
+      // 더 보기
+      for (var i = 0; i < 15 && i < hiddenVotes.length; i++) {
+        hiddenVotes[i].classList.remove('hidden');
+      }
+      if (visibleVotes.length + hiddenVotes.length <= 15) {
+        button.style.display = 'none';
+      } else {
+        button.classList.add('expanded');
+        button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"></path></svg>';
+      }
+    }
+  });
+</script>
 </body>
 </html>

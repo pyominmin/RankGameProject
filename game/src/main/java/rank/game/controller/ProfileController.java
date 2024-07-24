@@ -3,12 +3,17 @@ package rank.game.controller;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import rank.game.entity.MemberEntity;
+import rank.game.entity.VoteEntity;
 import rank.game.repository.MemberRepository;
+import rank.game.repository.VoteRepository;
 import rank.game.service.MemberService;
+
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -19,9 +24,10 @@ public class ProfileController {
 
     private final MemberService memberService;
     private final MemberRepository memberRepository;
+    private final VoteRepository voteRepository;
 
-    @GetMapping("/myPage")
-    public String myPage(HttpSession session, Model model) {
+    @GetMapping("/mainMyPage")
+    public String mainMyPage(HttpSession session, Model model) {
         boolean isLogin = session.getAttribute("loginEmail") != null;
         model.addAttribute("isLogin", isLogin);
 
@@ -30,22 +36,30 @@ public class ProfileController {
             // 서비스 계층을 통해 이메일로 회원 정보 조회
             Optional<MemberEntity> memberInfo = memberRepository.findByMemberEmail(memberEmail);
 
-            log.info("memberInfo: {}", memberInfo);
-            log.info("memberEmail: {}", memberEmail);
+            if (memberInfo.isPresent()) {
+                MemberEntity member = memberInfo.get();
+                List<VoteEntity> votes = voteRepository.findByNickname(member.getNickname());
+                votes.sort((v1, v2) -> v2.getVoteTime().compareTo(v1.getVoteTime()));
 
+                log.info("memberInfo: {}", memberInfo);
+                log.info("memberEmail: {}", memberEmail);
 
-            // 모델에 이름과 전화번호 추가하기
-            model.addAttribute("memberEmail", memberEmail);
-            model.addAttribute("memberName", memberInfo.get().getMemberName());
-            model.addAttribute("memberNickname", memberInfo.get().getNickname());
-
+                // 모델에 회원 정보 추가하기
+                model.addAttribute("memberEmail", memberEmail);
+                model.addAttribute("memberName", member.getMemberName());
+                model.addAttribute("memberNickname", member.getNickname());
+                model.addAttribute("votes", votes);
+            } else {
+                // 에러 처리나 기본값 설정 필요
+                model.addAttribute("error", "회원 정보를 찾을 수 없습니다.");
+            }
         } else {
-            // 에러 처리나 기본값 설정 필요
-            model.addAttribute("error", "회원 정보를 찾을 수 없습니다.");
+            model.addAttribute("error", "로그인 상태를 확인할 수 없습니다.");
         }
 
-        return "html/profile";
+        return "html/myPage";
     }
+
 
     @PostMapping("/change")
     public String updateMember(HttpSession session,
@@ -79,7 +93,12 @@ public class ProfileController {
                 }
 
             } catch (IllegalArgumentException e) {
-                model.addAttribute("error", e.getMessage());
+                if ("중복된 닉네임입니다.".equals(e.getMessage())) {
+                    model.addAttribute("message", "중복된 닉네임입니다.");
+                    model.addAttribute("searchUrl", "/profile/mainMyPage");
+                } else {
+                    model.addAttribute("error", e.getMessage());
+                }
                 log.error("Error updating member info: {}", e.getMessage());
             } catch (Exception e) {
                 model.addAttribute("error", "회원 정보를 업데이트하는 중 오류가 발생했습니다.");
