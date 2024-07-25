@@ -33,7 +33,7 @@
     .hidden { display: none; }
   </style>
 </head>
-<body style="background-color: #48265b">
+<body style="background-color: #48265b; padding-bottom: 50px;">
 <!-- Page Preloder -->
 <div id="preloder">
   <div class="loader"></div>
@@ -116,72 +116,73 @@
 </section>
 <!-- Page top end-->
 
-<div class="profile">
-  <div class="profile-header">
-    <div class="profile-info">
-      <!-- 회원 정보 표시 -->
-      <p class="profile-detail"><strong>이름:</strong> <span th:text="${memberName}">회원 이름</span></p>
-      <p class="profile-detail"><strong>이메일:</strong> <span th:text="${memberEmail}">이메일</span></p>
-      <p class="profile-detail"><strong>닉네임:</strong> <span th:text="${memberNickname}">닉네임</span></p>
+<div class="container-profile">
+  <div class="profile">
+    <div class="profile-header">
+      <div class="profile-image">
+        이미지
+      </div>
+      <div class="profile-buttons">
+        <button type="button">이미지 업로드</button>
+        <button type="button">이미지 제거</button>
+      </div>
+    </div>
+
+    <div class="profile-edit-form" id="profile-edit-form">
+      <form action="/profile/change" method="post">
+        <div class="detail-item">
+          <label class="detail-title" for="nickname">닉네임 변경</label>
+          <div class="input-button-group">
+            <input class="detail-value" id="nickname" name="memberNickname" type="text" th:value="${memberNickname}" placeholder="닉네임">
+            <button class="save-button" type="submit">변경</button>
+          </div>
+        </div>
+        <div class="detail-item">
+          <label class="detail-title" for="memberPassword">비밀번호 변경</label>
+          <div class="input-button-group">
+            <input class="detail-value" id="memberPassword" name="memberPassword" type="password" placeholder="비밀번호 변경">
+            <button class="save-button" type="submit">변경</button>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
-  <div class="edit-icon" id="edit-profile-btn">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M6 9l6 6 6-6"></path>
-    </svg>
-  </div>
 
-  <div class="profile-edit-form" id="profile-edit-form" style="display: none;">
-    <form action="/profile/change" method="post">
-      <div class="detail-item">
-        <label class="detail-title" for="nickname">닉네임 변경</label>
-        <input class="detail-value" id="nickname" name="memberNickname" type="text" th:value="${memberNickname}" placeholder="닉네임">
+  <div class="profile-page">
+    <div class="section posts">
+      <h2>내 게시물</h2>
+      <table>
+        <tbody>
+        <tr th:each="post, iterStat : ${posts}" th:classappend="${iterStat.index >= 5} ? 'hidden' : ''">
+          <td th:text="${post.id}">글 번호</td>
+          <td th:text="${post.title}">제목</td>
+          <td th:text="${post.comments}">댓글</td>
+          <td th:text="${post.likes}">좋아요</td>
+        </tr>
+        </tbody>
+      </table>
+      <div class="load-more-posts">
+        <i id="posts-arrow" class="fa fa-chevron-down"></i>
       </div>
-      <div class="detail-item">
-        <label class="detail-title" for="memberPassword">비밀번호 변경</label>
-        <input class="detail-value" id="memberPassword" name="memberPassword" type="password" th:value="${memberPassword}" placeholder="비밀번호 변경">
+    </div>
+
+    <section>
+      <div class="section votes">
+        <h2>내 투표</h2>
+        <div class="vote-list" th:each="entry, iterStat : ${groupedVotes}" th:classappend="${iterStat.index >= 5} ? 'hidden' : ''">
+          <p><strong th:text="${entry.key}">투표 날짜</strong></p>
+          <p th:text="${#strings.arrayJoin(entry.value.toArray(), ' / ')}">투표 내용</p>
+        </div>
+        <div class="load-more-votes">
+          <i id="votes-arrow" class="fa fa-chevron-down"></i>
+        </div>
       </div>
-      <button class="save-button" type="submit">변경사항 저장</button>
-    </form>
+    </section>
     <form action="/profile/delete" method="post" class="delete-form">
       <button class="delete-button" type="submit">탈퇴</button>
     </form>
   </div>
 </div>
-
-
-<div class="profile-page mx-auto px-4 py-8 sm:px-6 lg:px-8">
-  <h2 class="text-2xl font-bold mb-4">My Posts</h2>
-  <div class="space-y-4" th:each="post : ${posts}">
-    <div class="bg-white rounded-lg shadow p-4">
-      <div class="flex justify-between items-center mb-2">
-        <h3 class="text-lg font-medium" th:text="${post.title}">Awesome Game Review</h3>
-        <span class="text-sm text-gray-500" th:text="${post.date}">2023-04-15</span>
-      </div>
-      <p class="text-gray-600" th:text="${post.content}">Check out my in-depth review of the latest game release. You won't want to miss this!</p>
-    </div>
-  </div>
-</div>
-
-<div class="profile-page mx-auto px-4 py-8 sm:px-6 lg:px-8">
-  <h2 class="text-2xl font-bold mb-4">투표한 게임 리스트</h2>
-  <div class="votes-container" id="votes-container">
-    <div class="vote-item" th:each="vote, iterStat : ${votes}" th:classappend="${iterStat.index >= 15} ? 'hidden' : ''">
-      <div class="bg-white rounded-lg shadow p-4">
-        <div class="flex justify-between items-center mb-2">
-          <h3 class="text-lg font-medium" th:text="${vote.gameName}">Retro Arcade Comeback</h3>
-          <span class="text-sm text-gray-500" th:text="${vote.voteTime}">2023-05-01</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="load-more-icon" id="load-more-button">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M6 9l6 6 6-6"></path>
-    </svg>
-  </div>
-</div>
-
 
 
 
@@ -226,42 +227,29 @@
 <script src="/js/jquery.magnific-popup.min.js"></script>
 <script src="/js/main.js"></script>
 <script>
-  document.getElementById('edit-profile-btn').addEventListener('click', function() {
-    var form = document.getElementById('profile-edit-form');
-    if (form.style.display === 'none') {
-      form.style.display = 'block';
-    } else {
-      form.style.display = 'none';
-    }
-  });
+  document.addEventListener('DOMContentLoaded', function () {
+    var postsArrow = document.getElementById('posts-arrow');
+    var votesArrow = document.getElementById('votes-arrow');
+    var postsHidden = true;
+    var votesHidden = true;
 
-  document.getElementById('load-more-button').addEventListener('click', function() {
-    var button = document.getElementById('load-more-button');
-    var hiddenVotes = document.querySelectorAll('.vote-item.hidden');
-    var visibleVotes = document.querySelectorAll('.vote-item:not(.hidden)');
-    var totalVotes = document.querySelectorAll('.vote-item').length;
+    postsArrow.addEventListener('click', function () {
+      var hiddenPosts = document.querySelectorAll('.section.posts .hidden');
+      hiddenPosts.forEach(function (post) {
+        post.classList.toggle('hidden');
+      });
+      postsArrow.className = postsHidden ? 'fa fa-chevron-up' : 'fa fa-chevron-down';
+      postsHidden = !postsHidden;
+    });
 
-    if (button.classList.contains('expanded')) {
-      // 접기
-      for (var i = 0; i < visibleVotes.length; i++) {
-        if (i >= 15) {
-          visibleVotes[i].classList.add('hidden');
-        }
-      }
-      button.classList.remove('expanded');
-      button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg>';
-    } else {
-      // 더 보기
-      for (var i = 0; i < 15 && i < hiddenVotes.length; i++) {
-        hiddenVotes[i].classList.remove('hidden');
-      }
-      if (visibleVotes.length + hiddenVotes.length <= 15) {
-        button.style.display = 'none';
-      } else {
-        button.classList.add('expanded');
-        button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"></path></svg>';
-      }
-    }
+    votesArrow.addEventListener('click', function () {
+      var hiddenVotes = document.querySelectorAll('.section.votes .hidden');
+      hiddenVotes.forEach(function (vote) {
+        vote.classList.toggle('hidden');
+      });
+      votesArrow.className = votesHidden ? 'fa fa-chevron-up' : 'fa fa-chevron-down';
+      votesHidden = !votesHidden;
+    });
   });
 </script>
 </body>

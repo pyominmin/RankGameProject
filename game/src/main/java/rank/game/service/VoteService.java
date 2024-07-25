@@ -54,4 +54,8 @@ public class VoteService {
         LocalDate today = LocalDate.now();
         return voteRepository.existsByNicknameAndVoteTime(nickname, today);
     }
+
+    public List<VoteEntity> getVotes() {
+        return voteRepository.findAll();
+    }
 }

@@ -3004,10 +3004,17 @@ ol {
 }
 
 /* 프로필 */
+.container-profile {
+	display: flex;
+	max-width: 1200px;
+	margin: auto;
+	padding: 20px;
+	gap: 20px;
+}
 .profile {
-	width: 80%;
-	margin: 50px auto;
-	background-color: white;
+	width: 400px;
+	height: 600px;
+	background-color: #4f366c;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -3017,97 +3024,77 @@ ol {
 	text-align: center;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 .profile-header {
-	display: flex;
-	align-items: center;
-	margin-bottom: 2rem;
-	justify-content: center;
-	width: 100%;
-}
-
-.avatar {
-	flex-shrink: 0;
-	width: 64px;
-	height: 64px;
-	border-radius: 50%;
-	overflow: hidden;
-	margin-right: 1rem;
-}
-
-.avatar img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-}
-
-.profile-info {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	flex-grow: 1;
 }
-
-.profile-detail {
-	margin: 0;
-	font-size: 1rem;
-	color: black;
-	margin-bottom: 0.5rem;
-}
-
-.edit-icon {
-	cursor: pointer;
+.profile-image {
+	width: 200px;
+	height: 200px;
+	background-color: white;
+	margin-bottom: 1rem;
 	display: flex;
+	justify-content: center;
 	align-items: center;
-	margin-top: 1rem;
+	color: black;
 }
-
-.edit-icon svg {
-	stroke: black;
-	width: 24px;
-	height: 24px;
-	transition: transform 0.2s ease-in-out;
+.profile-buttons {
+	display: flex;
+	justify-content: space-between;
+	width: 350px;
+	gap: 0.5rem;
 }
-
-.edit-icon:hover svg {
-	transform: rotate(180deg);
+.profile-buttons button {
+	background-color: #6a1b9a;
+	color: white;
+	border: none;
+	padding: 0.75rem 1.5rem;
+	cursor: pointer;
+	font-size: 1rem;
+	transition: background-color 0.2s ease-in-out;
+	width: 48%;
 }
-
+.profile-buttons button:hover {
+	background-color: #5b1483;
+}
 .profile-edit-form {
-	margin-top: 2rem;
 	width: 100%;
 }
-
 .detail-item {
 	display: flex;
 	flex-direction: column;
 	align-items: start;
 	width: 100%;
+	margin-bottom: 1rem;
 }
-
 .detail-title {
 	margin-bottom: 0.5rem;
 	font-size: 1rem;
 	font-weight: 500;
+	color: white;
+	margin-top: 5px;
 }
-
-.detail-value {
+.input-button-group {
+	display: flex;
 	width: 100%;
+	align-items: center;
+}
+.detail-value {
+	flex-grow: 1;
 	padding: 0.5rem;
 	border: 1px solid #d1d5db;
 	border-radius: 0.375rem;
 	background-color: #fff;
 	color: #333;
 	font-size: 1rem;
-	margin-bottom: 0.5rem;
+	margin-right: 0.5rem;
 	transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
-
 .detail-value:hover {
 	border-color: #3b82f6;
 	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
 }
-
 .save-button {
 	background-color: #1f2937;
 	color: #fff;
@@ -3117,17 +3104,14 @@ ol {
 	cursor: pointer;
 	font-size: 1rem;
 	transition: background-color 0.2s ease-in-out;
-	margin-top: 1rem;
 }
-
 .save-button:hover {
 	background-color: #111827;
 }
-
 .delete-form {
-	margin-top: 1rem;
 	display: flex;
-	justify-content: center;
+	justify-content: flex-end;
+	margin-top: 1rem;
 }
 
 .delete-button {
@@ -3138,106 +3122,71 @@ ol {
 	border-radius: 4px;
 	cursor: pointer;
 	font-size: 16px;
-	margin-top: 1rem;
 }
-
 .delete-button:hover {
 	background-color: #ff1a1a;
 }
-
-/* 마이페이지 */
 .profile-page {
-	width: 80%;
-	margin: 50px auto;
-	background-color: #fff;
+	width: 70%;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+.section {
 	padding: 20px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-	border-radius: 0.5rem; /* 추가된 부분 */
-}
-
-h1 {
+	border-radius: 0.5rem;
 	color: #333;
-	text-align: center;
+}
+.section h2 {
 	margin-bottom: 30px;
 }
-
-.card {
-	margin-bottom: 20px;
+.posts {
+	background-color: #4f366c; /* 섹션 1: 진한 보라색 배경 */
+}
+.posts h2 {
+	color: white; /* 제목의 글자색을 흰색으로 */
+}
+.posts table {
+	width: 100%;
+	border-collapse: collapse;
+}
+.posts td {
 	border: 1px solid #ddd;
-	border-radius: 5px;
+	padding: 10px;
+	text-align: left;
+	background-color: #fff;
 }
-
-.card-header {
-	background-color: #007bff;
+.votes {
+	background-color: #4f366c;
+}
+.votes h2 {
 	color: white;
-	padding: 10px 20px;
-	border-bottom: 1px solid #ddd;
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
 }
-
-.list-group {
-	list-style-type: none;
-	padding: 0;
-	margin: 0;
+.vote-list {
+	background-color: #3d1752;
+	padding: 20px;
+	border-radius: 0.5rem;
+	margin-bottom: 15px;
 }
-
-.list-group-item {
-	padding: 15px 20px;
-	border-bottom: 1px solid #ddd;
+.vote-list p {
+	color: white;
 }
-
-.list-group-item:last-child {
-	border-bottom: none;
+.hidden {
+	display: none;
 }
-
-h3 {
-	margin: 0 0 10px;
-	font-size: 1.5em;
-	color: #007bff;
-}
-
-p {
-	margin: 0;
-	font-size: 1rem;
-	color: #555;
-}
-
-span {
-	font-size: 1rem;
-	color: #555;
-}
-
-.votes-container {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 1rem;
-}
-
-.vote-item {
-	flex: 1 1 calc(20% - 1rem); /* 5개씩 배치 */
-	box-sizing: border-box;
-}
-
-.vote-item .bg-white {
-	height: 100%; /* 카드의 높이를 통일하기 위해 추가 */
-}
-
-.load-more-icon {
+.load-more-posts, .load-more-votes {
 	display: flex;
 	justify-content: center;
-	align-items: center;
-	cursor: pointer;
 	margin-top: 1rem;
+	cursor: pointer;
 }
-
-.load-more-icon svg {
-	width: 24px;
-	height: 24px;
-	transition: transform 0.2s ease-in-out;
+.load-more-posts i, .load-more-votes i {
+	font-size: 24px;
+	color: white;
+	transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
-
-.load-more-icon:hover svg {
+.load-more-posts i:hover, .load-more-votes i:hover {
+	color: #3d1751;
 	transform: scale(1.2);
 }
-

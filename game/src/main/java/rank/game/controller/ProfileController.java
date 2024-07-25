@@ -12,9 +12,13 @@ import rank.game.entity.VoteEntity;
 import rank.game.repository.MemberRepository;
 import rank.game.repository.VoteRepository;
 import rank.game.service.MemberService;
+import rank.game.service.VoteService;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -25,6 +29,7 @@ public class ProfileController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final VoteRepository voteRepository;
+    private final VoteService voteService;
 
     @GetMapping("/mainMyPage")
     public String mainMyPage(HttpSession session, Model model) {
@@ -41,14 +46,18 @@ public class ProfileController {
                 List<VoteEntity> votes = voteRepository.findByNickname(member.getNickname());
                 votes.sort((v1, v2) -> v2.getVoteTime().compareTo(v1.getVoteTime()));
 
-                log.info("memberInfo: {}", memberInfo);
-                log.info("memberEmail: {}", memberEmail);
+                // 날짜별로 투표 내용 그룹화
+                Map<LocalDate, List<String>> groupedVotes = votes.stream()
+                        .collect(Collectors.groupingBy(
+                                VoteEntity::getVoteTime,
+                                Collectors.mapping(VoteEntity::getGameName, Collectors.toList())
+                        ));
 
                 // 모델에 회원 정보 추가하기
                 model.addAttribute("memberEmail", memberEmail);
                 model.addAttribute("memberName", member.getMemberName());
                 model.addAttribute("memberNickname", member.getNickname());
-                model.addAttribute("votes", votes);
+                model.addAttribute("groupedVotes", groupedVotes);
             } else {
                 // 에러 처리나 기본값 설정 필요
                 model.addAttribute("error", "회원 정보를 찾을 수 없습니다.");
