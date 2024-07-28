@@ -4,17 +4,28 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import rank.game.entity.MemberEntity;
+import rank.game.entity.ProfileEntity;
 import rank.game.entity.VoteEntity;
 import rank.game.repository.MemberRepository;
+import rank.game.repository.ProfileRepository;
 import rank.game.repository.VoteRepository;
 import rank.game.service.MemberService;
+import rank.game.service.ProfileService;
 import rank.game.service.VoteService;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,6 +41,33 @@ public class ProfileController {
     private final MemberRepository memberRepository;
     private final VoteRepository voteRepository;
     private final VoteService voteService;
+    private final ProfileService profileService;
+    private final ProfileRepository profileRepository;
+
+    @PostMapping("/upload")
+    @ResponseBody
+    public Map<String, Object> handleFileUpload(@RequestParam("file") MultipartFile file, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String memberEmail = (String) session.getAttribute("loginEmail");
+            if (memberEmail == null) {
+                response.put("success", false);
+                response.put("message", "세션에 이메일이 없습니다.");
+                return response;
+            }
+
+            String fileUrl = profileService.saveProfile(memberEmail, file);
+            System.out.println("File URL: " + fileUrl); // 로그 출력
+
+            response.put("success", true);
+            response.put("imageUrl", fileUrl);
+        } catch (Exception e) {
+            log.error("File upload error", e);
+            response.put("success", false);
+            response.put("message", "파일 업로드 중 오류 발생");
+        }
+        return response;
+    }
 
     @GetMapping("/mainMyPage")
     public String mainMyPage(HttpSession session, Model model) {
@@ -38,7 +76,6 @@ public class ProfileController {
 
         String memberEmail = (String) session.getAttribute("loginEmail");
         if (memberEmail != null) {
-            // 서비스 계층을 통해 이메일로 회원 정보 조회
             Optional<MemberEntity> memberInfo = memberRepository.findByMemberEmail(memberEmail);
 
             if (memberInfo.isPresent()) {
@@ -46,20 +83,22 @@ public class ProfileController {
                 List<VoteEntity> votes = voteRepository.findByNickname(member.getNickname());
                 votes.sort((v1, v2) -> v2.getVoteTime().compareTo(v1.getVoteTime()));
 
-                // 날짜별로 투표 내용 그룹화
                 Map<LocalDate, List<String>> groupedVotes = votes.stream()
                         .collect(Collectors.groupingBy(
                                 VoteEntity::getVoteTime,
                                 Collectors.mapping(VoteEntity::getGameName, Collectors.toList())
                         ));
 
-                // 모델에 회원 정보 추가하기
+                Optional<ProfileEntity> profileOpt = profileService.getProfileByEmail(memberEmail);
+                String profileImageUrl = profileOpt.map(ProfileEntity::getFilePath)
+                        .orElse("https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdAqmkb%2FbtsHBpCK2sR%2F5f2REVwRSQkiJ3qWkAcZkK%2Fimg.png");
+
                 model.addAttribute("memberEmail", memberEmail);
                 model.addAttribute("memberName", member.getMemberName());
                 model.addAttribute("memberNickname", member.getNickname());
                 model.addAttribute("groupedVotes", groupedVotes);
+                model.addAttribute("profileImageUrl", profileImageUrl);
             } else {
-                // 에러 처리나 기본값 설정 필요
                 model.addAttribute("error", "회원 정보를 찾을 수 없습니다.");
             }
         } else {

@@ -119,14 +119,16 @@
 <div class="container-profile">
   <div class="profile">
     <div class="profile-header">
-      <div class="profile-image">
-        이미지
+      <div class="profile-image" id="profile-image">
+        <img id="profile-image-img" th:src="${profileImageUrl}" alt="프로필 이미지" style="width: 100%; height: 100%; object-fit: cover;">
       </div>
       <div class="profile-buttons">
-        <button type="button">이미지 업로드</button>
-        <button type="button">이미지 제거</button>
+        <input type="file" id="imageUpload" style="display: none;" />
+        <button type="button" onclick="document.getElementById('imageUpload').click();">이미지 업로드</button>
+        <button type="button" onclick="removeImage();">이미지 제거</button>
       </div>
     </div>
+
 
     <div class="profile-edit-form" id="profile-edit-form">
       <form action="/profile/change" method="post">
@@ -251,6 +253,45 @@
       votesHidden = !votesHidden;
     });
   });
+
+
+
+  document.getElementById('imageUpload').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      fetch('/profile/upload', {
+        method: 'POST',
+        body: formData
+      })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  const imageUrl = data.imageUrl;
+                  const profileImage = document.getElementById('profile-image-img');
+                  profileImage.src = imageUrl;
+                  profileImage.style.display = 'block';
+                } else {
+                  alert('이미지 업로드 실패: ' + data.message);
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                alert('이미지 업로드 중 오류 발생');
+              });
+    } else {
+      alert('파일을 선택하세요.');
+    }
+  });
+
+  function removeImage() {
+    const profileImage = document.getElementById('profile-image-img');
+    profileImage.src = 'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FdAqmkb%2FbtsHBpCK2sR%2F5f2REVwRSQkiJ3qWkAcZkK%2Fimg.png';
+    document.getElementById('imageUpload').value = '';
+  }
+
 </script>
 </body>
 </html>
