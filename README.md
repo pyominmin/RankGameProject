@@ -20,7 +20,7 @@
 
 <br>
 
-## 구현 기능
+## 구현 기능 미리보기
 
 ### 1. 회원가입
 
@@ -41,12 +41,13 @@
 
 ### 5. 인기 게임 API 연동(사용자조회, 전적조회)
 
-![API](https://github.com/user-attachments/assets/cff31541-86f7-4768-94c1-6a2e22433bff)
+![API](https://github.com/user-attachments/assets/43509bbb-5c69-4d3a-a625-a5b7cf7932e7)
 
 
-### 6. 마이페이지
+### 6. 마이페이지(내가 쓴 게시글, 내가 투표한 기록, 프로필 등록, 닉네임/비밀번호 변경)
 
-![myPage](https://github.com/user-attachments/assets/62006a0e-537f-4291-8634-c2c7af9abba9)
+![myPage](https://github.com/user-attachments/assets/24286963-47db-4b83-9573-75cae2a5a5d5)
+
 
 
 <br>
