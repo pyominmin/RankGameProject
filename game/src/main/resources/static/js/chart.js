@@ -62,7 +62,7 @@ $(document).ready(function() {
             scales: {
                 y: {
                     beginAtZero: true,
-                    reverse: true,  // 순위가 낮은 숫자가 상단에 표시되도록 반전
+                    reverse: false,  // 순위가 낮은 숫자가 상단에 표시되도록 반전
                     ticks: {
                         color: 'white' // y축 글씨 색상 변경
                     }

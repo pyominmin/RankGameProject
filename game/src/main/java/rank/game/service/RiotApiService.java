@@ -18,7 +18,7 @@ import java.util.*;
 @Service
 public class RiotApiService {
     private final RestTemplate restTemplate;
-    private final String apiKey = "RGAPI-6dab33a6-7715-4aa8-b831-faf01686f229";
+    private final String apiKey = "RGAPI-ef59b225-02cc-490a-8945-33539eb516f0";
     private final String headerName = "X-Riot-Token";
 
     public RiotApiService() {

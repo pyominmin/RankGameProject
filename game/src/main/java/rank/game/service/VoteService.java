@@ -1,5 +1,6 @@
 package rank.game.service;
 
+import jakarta.persistence.NonUniqueResultException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rank.game.dto.VoteDTO;
@@ -28,22 +29,29 @@ public class VoteService {
     }
 
     public void incrementVote(String gameName) {
-        Optional<Game> gameOptional = gameRepository.findByGameName(gameName);
-        if (gameOptional.isPresent()) {
-            Game game = gameOptional.get();
+        List<Game> games = gameRepository.findByGameName(gameName);
+        if (games.size() == 1) {
+            Game game = games.get(0);
             game.setGameVote(game.getGameVote() + 1);
             gameRepository.save(game);
-        } else {
+        } else if (games.isEmpty()) {
             throw new RuntimeException("Game not found");
+        } else {
+            throw new NonUniqueResultException("Multiple games found with name: " + gameName);
         }
     }
 
     public void saveVotes(String nickname, List<String> gameNames) {
+        LocalDate today = LocalDate.now();
+        if (hasVotedToday(nickname)) {
+            throw new RuntimeException("User has already voted today");
+        }
+
         for (String gameName : gameNames) {
             VoteEntity vote = new VoteEntity();
             vote.setNickname(nickname);
             vote.setGameName(gameName);
-            vote.setVoteTime(LocalDate.now());
+            vote.setVoteTime(today);
             voteRepository.save(vote);
 
             incrementVote(gameName);
@@ -59,3 +67,4 @@ public class VoteService {
         return voteRepository.findAll();
     }
 }
+
