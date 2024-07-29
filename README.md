@@ -1,5 +1,6 @@
 # 프로젝트 이름 - RankGame
 <br>
+
 ## 프로젝트 소개
 
  게임을 좋아하는 사람들이 RankGame 웹 사이트에서 다양한 기능을 편리하게 이용할 수 있는 종합 게임 커뮤니티 플랫폼 구축
@@ -13,19 +14,40 @@
 |<img src="https://images.velog.io/images/galaxy/post/b501f325-1810-4e26-962e-e66ca0b94ca9/image.png" width="100px"> |<img src="https://velog.velcdn.com/images/parkirae/post/7987977e-4187-4756-a09f-c8e8ceda6e4d/image.png" width="100px">|<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSA9h4HeUrM518StL4CQ1gnf2lQiIH-DH3xpg&s" width="100px">   |<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSF9UXfrx8TWM7eyKB1jdIk66ZoGVmTtqWjKQ&s" width="100px">|<img src="https://cdn.prod.website-files.com/601064f495f4b4967f921aa9/635884ad45bd4b4723f4bc39_202210-rds-logo.png" width="100px">|<img src="https://miro.medium.com/v2/resize:fit:360/1*wylmHpaFcR6n17js3ni8Tw.png" width="100px">|
 <br>
 
+## 나의 역할
+
+ 로그인/ 회원가입/ 게임투표/ 롤 API 연동/ 마이페이지/ 관리자 페이지(회원관리)
+
+<br>
+
 ## 구현 기능
 
 ### 1. 회원가입
 
 ### 2. 로그인
 
+![login](https://github.com/user-attachments/assets/31beb31f-a485-41b7-9589-90597f1ab837)
+
+
 ### 3. 게임 투표
+
+![gameVote](https://github.com/user-attachments/assets/368af512-f8dc-44ea-a63e-ee6eccfca8ef)
+
 
 ### 4. 게임 순위 시각화(그래프)
 
+![gameRank](https://github.com/user-attachments/assets/003b4a81-2e07-4372-8edc-3609ced004eb)
+
+
 ### 5. 인기 게임 API 연동(사용자조회, 전적조회)
 
-### 6. 게시판
+![API](https://github.com/user-attachments/assets/cff31541-86f7-4768-94c1-6a2e22433bff)
+
+
+### 6. 마이페이지
+
+![myPage](https://github.com/user-attachments/assets/62006a0e-537f-4291-8634-c2c7af9abba9)
+
 
 <br>
 
