@@ -21,37 +21,53 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final VoteRepository voteRepository;
 
-
-    //회원가입
+    // 회원가입
     public void save(MemberDTO memberDTO, String memberPassword) {
+        // 모든 회원은 기본적으로 "USER" 권한을 가짐
+        memberDTO.setRole("ROLE_USER");
         memberDTO.setMemberPassword(passwordEncoder.encode(memberPassword));
+
+        // 특정 아이디와 비밀번호를 가진 회원에게 "ADMIN" 권한 부여
+        if ("admin@admin.com".equals(memberDTO.getMemberEmail()) && "123456789".equals(memberPassword)) {
+            memberDTO.setRole("ROLE_ADMIN");
+        }
+
         MemberEntity memberEntity = MemberEntity.toMemberEntity(memberDTO);
         memberRepository.save(memberEntity);
     }
 
-    //이메일 중복확인
-    public boolean emailExists(String memberEmail) {
+    // 어드민 계정 생성
+    public void createAdminAccount() {
+        if (!memberRepository.existsByMemberEmail("admin@admin.com")) {
+            MemberDTO adminDTO = new MemberDTO();
+            adminDTO.setMemberEmail("admin@admin.com");
+            adminDTO.setMemberPassword("123456789");
+            adminDTO.setMemberName("Admin");
+            adminDTO.setNickname("Admin");
+            adminDTO.setRole("ROLE_ADMIN");
+            save(adminDTO, "123456789");
+            log.info("Admin account created: admin@admin.com");
+        }
+    }
 
+    // 이메일 중복 확인
+    public boolean emailExists(String memberEmail) {
         return memberRepository.existsByMemberEmail(memberEmail);
     }
-    //닉네임 중복확인
-    public boolean nicknameExists(String nickname) {
 
+    // 닉네임 중복 확인
+    public boolean nicknameExists(String nickname) {
         return memberRepository.existsByNickname(nickname);
     }
 
-    //로그인
+    // 로그인
     public MemberDTO login(MemberDTO memberDTO) {
         Optional<MemberEntity> byMemberEmail = memberRepository.findByMemberEmail(memberDTO.getMemberEmail());
         if (byMemberEmail.isPresent()) {
             MemberEntity memberEntity = byMemberEmail.get();
             String encodedPassword = memberEntity.getMemberPassword();
             if (passwordEncoder.matches(memberDTO.getMemberPassword(), encodedPassword)) {
-                MemberDTO dto = MemberDTO.fromEntity(memberEntity);
-                if ("admin@admin.com".equals(memberEntity.getMemberEmail())) {
-                    dto.setAdmin(true);
-                }
-                return dto;
+                return MemberDTO.fromEntity(memberEntity);
             } else {
                 return null;
             }

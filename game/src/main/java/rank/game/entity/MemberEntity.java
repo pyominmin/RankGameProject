@@ -12,10 +12,6 @@ import rank.game.dto.MemberDTO;
 @Getter
 @ToString
 @Table(name = "membership")
-//@SequenceGenerator(
-//        name = "PLTOO_SEQ_GENERATOR",
-//        sequenceName = "PLTOO_SEQ", //매핑할 데이터베이스 시퀀스 이름
-//        initialValue = 1, allocationSize = 5)//낮은 값으로 설정. 시퀀스 번호가 낭비 방지
 public class MemberEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,35 +30,8 @@ public class MemberEntity {
     @Column(name = "nickname", length = 8)
     private String nickname;
 
-
-    // Additional methods for password verification and equality checks
-    public boolean isCorrectPassword(String inputPassword) {
-        // Placeholder method, needs real implementation based on your password management logic
-        return this.memberPassword.equals(inputPassword);
-    }
-
-//    public byte[] getSalt() {
-//        // Placeholder method, adjust as per actual salt management
-//        return new byte[16]; // Example, return actual salt used in password hashing
-//    }
-
-    public String getEncryptedPassword() {
-        return this.memberPassword;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof MemberEntity) {
-            MemberEntity other = (MemberEntity) obj;
-            return this.num != null && this.num.equals(other.getNum());
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 * (num != null ? num.hashCode() : 0);
-    }
+    @Column(name = "role", length = 20)
+    private String role;
 
     public static MemberEntity toMemberEntity(MemberDTO memberDTO) {
         MemberEntity memberEntity = new MemberEntity();
@@ -71,8 +40,20 @@ public class MemberEntity {
         memberEntity.setMemberPassword(memberDTO.getMemberPassword());
         memberEntity.setMemberName(memberDTO.getMemberName());
         memberEntity.setNickname(memberDTO.getNickname());
+        memberEntity.setRole(memberDTO.getRole()); // Role 설정 추가
         return memberEntity;
     }
 
-}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        MemberEntity that = (MemberEntity) obj;
+        return num != null && num.equals(that.num);
+    }
 
+    @Override
+    public int hashCode() {
+        return 31 * (num != null ? num.hashCode() : 0);
+    }
+}

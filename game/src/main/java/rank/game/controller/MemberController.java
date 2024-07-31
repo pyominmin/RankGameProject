@@ -4,16 +4,19 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import rank.game.dto.MemberDTO;
-import rank.game.repository.MemberRepository;
 import rank.game.service.MemberService;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
-
 
 @Slf4j
 @Controller
@@ -22,8 +25,6 @@ import java.util.Map;
 public class MemberController {
 
     private final MemberService memberService;
-    private final MemberRepository memberRepository;
-
 
     @GetMapping("/signup")
     public String goToSignUp(HttpSession session, Model model) {
@@ -32,7 +33,6 @@ public class MemberController {
         return "html/signup";
     }
 
-    //이메일 중복인지 가입 시 체크하는 항목
     @PostMapping("/check-email")
     public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam String memberEmail) {
         boolean exists = memberService.emailExists(memberEmail);
@@ -80,20 +80,28 @@ public class MemberController {
         }
     }
 
-    // 로그인 처리
     @GetMapping("/admin")
-    public String adminPage(HttpSession session, Model model) {
-        Boolean isAdmin = (Boolean) session.getAttribute("isAdmin");
-        log.info("isAdmin: {}", isAdmin); // 로그 추가
-        log.info("Admin Page Access Attempt. Is Admin: {}", isAdmin);
-        if (isAdmin != null && isAdmin) {
+    public String adminPage(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+
+        log.info("Current Authentication: {}", authentication);
+        log.info("Authenticated User: {}", authentication.getName());
+        log.info("Is Admin: {}", isAdmin);
+
+        if (isAdmin) {
             model.addAttribute("isLogin", true);
             model.addAttribute("isAdmin", true);
+
+            log.info("Admin access granted. Returning admin page.");
             return "html/admin"; // 관리자 페이지 템플릿 이름
         } else {
+            log.warn("Admin access denied. Redirecting to main page.");
             return "redirect:/"; // 관리자 권한이 없으면 메인 페이지로 리다이렉트
         }
     }
+
 
     @PostMapping("/login")
     public String login(@ModelAttribute MemberDTO memberDTO, HttpSession session, Model model) {
@@ -102,18 +110,18 @@ public class MemberController {
         if (loginResult != null) {
             session.setAttribute("loginEmail", loginResult.getMemberEmail());
             session.setAttribute("nickname", loginResult.getNickname());
-            session.setAttribute("memberNum", loginResult.getMemberNum());
-            session.setAttribute("isAdmin", loginResult.isAdmin());
+            session.setAttribute("memberNum", loginResult.getNum());
+            session.setAttribute("isAdmin", loginResult.getRole().equals("ROLE_ADMIN"));
 
             log.info("Login Success: {}", loginResult.getMemberEmail());
-            log.info("Is Admin: {}", loginResult.isAdmin());
+            log.info("Is Admin: {}", loginResult.getRole().equals("ROLE_ADMIN"));
 
             model.addAttribute("isLogin", true);
-            model.addAttribute("isAdmin", loginResult.isAdmin());
+            model.addAttribute("isAdmin", loginResult.getRole().equals("ROLE_ADMIN"));
 
             // 로그인 성공 후 관리자 여부에 따라 리다이렉트
-            if (loginResult.isAdmin()) {
-                return "redirect:/member/admin";
+            if (loginResult.getRole().equals("ROLE_ADMIN")) {
+                return "redirect:/admin";
             } else {
                 return "redirect:/"; // 일반 사용자 메인 페이지로 리다이렉트
             }
@@ -133,5 +141,5 @@ public class MemberController {
         model.addAttribute("searchUrl", "/");
         return "html/message";
     }
-}
 
+}

@@ -58,7 +58,7 @@
 						<div class="auth" th:if="${isLogin}">
 							<a href="/profile/mainMyPage">마이페이지</a> /
 							<a href="/member/logout">로그아웃</a>
-							<span th:if="${isAdmin != null and isAdmin}"><a href="/admin">관리자 페이지</a></span>
+							<span th:if="${isAdmin}"><a href="/admin/main">관리자 페이지</a></span>
 						</div>
 						<div class="auth" th:if="${!isLogin}">
 							<a href="#" id="login-btn">로그인</a> / <a href="/member/signup">회원가입</a>
