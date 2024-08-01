@@ -80,29 +80,6 @@ public class MemberController {
         }
     }
 
-    @GetMapping("/admin")
-    public String adminPage(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-
-        log.info("Current Authentication: {}", authentication);
-        log.info("Authenticated User: {}", authentication.getName());
-        log.info("Is Admin: {}", isAdmin);
-
-        if (isAdmin) {
-            model.addAttribute("isLogin", true);
-            model.addAttribute("isAdmin", true);
-
-            log.info("Admin access granted. Returning admin page.");
-            return "html/admin"; // 관리자 페이지 템플릿 이름
-        } else {
-            log.warn("Admin access denied. Redirecting to main page.");
-            return "redirect:/"; // 관리자 권한이 없으면 메인 페이지로 리다이렉트
-        }
-    }
-
-
     @PostMapping("/login")
     public String login(@ModelAttribute MemberDTO memberDTO, HttpSession session, Model model) {
         MemberDTO loginResult = memberService.login(memberDTO);
@@ -121,7 +98,9 @@ public class MemberController {
 
             // 로그인 성공 후 관리자 여부에 따라 리다이렉트
             if (loginResult.getRole().equals("ROLE_ADMIN")) {
-                return "redirect:/admin";
+                model.addAttribute("message", "관리자 페이지입니다.");
+                model.addAttribute("searchUrl", "/admin/main");
+                return "html/message"; // 로그인 실패 시 메시지 페이지로 이동
             } else {
                 return "redirect:/"; // 일반 사용자 메인 페이지로 리다이렉트
             }
