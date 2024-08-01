@@ -26,7 +26,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return User.builder()
                 .username(member.getMemberEmail())
                 .password(member.getMemberPassword())
-                .roles(member.getRole().replace("ROLE_", "")) // 권한 설정
+                .roles(member.getRole()) // 권한 설정
                 .build();
     }
 }
