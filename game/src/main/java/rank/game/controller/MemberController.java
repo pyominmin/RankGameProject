@@ -4,8 +4,10 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,10 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import rank.game.dto.MemberDTO;
 import rank.game.service.MemberService;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -90,24 +89,42 @@ public class MemberController {
             session.setAttribute("memberNum", loginResult.getNum());
             session.setAttribute("isAdmin", loginResult.getRole().equals("ROLE_ADMIN"));
 
-            log.info("Login Success: {}", loginResult.getMemberEmail());
-            log.info("Is Admin: {}", loginResult.getRole().equals("ROLE_ADMIN"));
+            log.info("로그인 성공: {}", loginResult.getMemberEmail());
+            log.info("관리자 여부: {}", loginResult.getRole().equals("ROLE_ADMIN"));
 
             model.addAttribute("isLogin", true);
             model.addAttribute("isAdmin", loginResult.getRole().equals("ROLE_ADMIN"));
 
+            // 현재 인증 정보를 가져옵니다.
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null) {
+                log.info("Authentication object is not null");
+                log.info("Authorities: {}", authentication.getAuthorities());
+            } else {
+                log.info("Authentication object is null");
+            }
+
+            // 사용자 인증 정보를 수동으로 설정합니다.
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority(loginResult.getRole()));
+
+            Authentication auth = new UsernamePasswordAuthenticationToken(loginResult.getMemberEmail(), null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            // 인증된 사용자가 ADMIN 권한을 가지고 있는지 확인합니다.
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+            log.info("isAdmin: {}", isAdmin);
+
             // 로그인 성공 후 관리자 여부에 따라 리다이렉트
-            if (loginResult.getRole().equals("ROLE_ADMIN")) {
-                model.addAttribute("message", "관리자 페이지입니다.");
-                model.addAttribute("searchUrl", "/admin/main");
-                return "html/message"; // 로그인 실패 시 메시지 페이지로 이동
+            if (isAdmin) {
+                return "html/admin"; // 관리자 페이지로 이동
             } else {
                 return "redirect:/"; // 일반 사용자 메인 페이지로 리다이렉트
             }
         } else {
-            model.addAttribute("message", "로그인 실패하였습니다.");
-            model.addAttribute("searchUrl", "/");
-            return "html/message"; // 로그인 실패 시 메시지 페이지로 이동
+            model.addAttribute("isLogin", false);
+            return "index"; // 로그인 실패 시 로그인 페이지로 리다이렉트
         }
     }
 
@@ -122,3 +139,4 @@ public class MemberController {
     }
 
 }
+
