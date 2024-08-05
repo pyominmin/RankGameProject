@@ -3190,3 +3190,97 @@ ol {
 	color: #3d1751;
 	transform: scale(1.2);
 }
+
+/* 회원관리 admin*/
+#membercontroll-search, #membercontroll-search-button {
+	padding: 8px;
+	border-radius: 5px;
+	border: 1px solid #ddd;
+	background-color: #643d7c; /* 배경색 */
+	color: white; /* 글씨 색상 */
+}
+
+#membercontroll-search {
+	flex-grow: 1; /* 입력 필드가 가용 공간을 채우도록 함 */
+	margin-right: 10px; /* 버튼과의 간격 */
+}
+
+#membercontroll-search-button {
+	cursor: pointer; /* 버튼 위에 마우스를 올렸을 때 커서 모양 변경 */
+	background-color: #5a4e7c; /* 버튼 배경색을 약간 다르게 설정 */
+}
+/* Select 박스 공통 스타일 */
+.membercontroll-role-select, #membercontroll-category {
+	padding: 8px;
+	border-radius: 5px;
+	border: 1px solid #ddd;
+	background-color: #643d7c; /* 배경색 */
+	color: white; /* 글씨 색상 */
+}
+
+.membercontroll-section {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 20px;
+	background-color: #461753;
+	color: white;
+}
+
+.membercontroll-container {
+	width: 80%;
+	max-width: 1200px;
+	background-color: #4f366c;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+	margin-bottom: 20px;
+}
+
+.membercontroll-search-container {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.membercontroll-search-container label,
+.membercontroll-search-container select,
+.membercontroll-search-container input,
+.membercontroll-search-container button {
+	margin-right: 10px;
+	color: white; /* 검색 컨테이너 요소들의 글씨 색상 */
+}
+
+.membercontroll-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.membercontroll-table th,
+.membercontroll-table td {
+	padding: 12px;
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+	background-color: #643d7c; /* 테이블 헤더와 셀의 배경 색상 설정 */
+	color: white; /* 테이블 헤더와 셀의 텍스트 색상을 흰색으로 설정 */
+}
+
+.membercontroll-table tr:hover {
+	background-color: #643d7c; /* 마우스 호버 시 배경 색상 유지 */
+}
+
+.membercontroll-role-select {
+	padding: 8px;
+	border-radius: 5px;
+	border: 1px solid #ddd;
+	background-color: #643d7c; /* 드롭다운 메뉴의 배경 색상 설정 */
+	color: white;
+}
+#load-more-button {
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: white;
+}

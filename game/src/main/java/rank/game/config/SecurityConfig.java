@@ -44,9 +44,21 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // CSRF 보호 비활성화
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // ADMIN 권한 필요
-                        .requestMatchers("/manager/**").hasRole("MANAGER") // MANAGER 권한 필요
+                        .requestMatchers("/admin/**").hasAnyRole("ADMIN", "MANAGER") // ADMIN 또는 MANAGER 권한 필요
                         .anyRequest().permitAll() // 나머지 요청은 모두 허용
+                )
+                .formLogin(form -> form
+                        .loginPage("/login") // 사용자 정의 로그인 페이지
+                        .defaultSuccessUrl("/", true) // 로그인 성공 후 리다이렉트 페이지
+                        .failureUrl("/login?error=true") // 로그인 실패 후 리다이렉트 페이지
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                        .logoutSuccessUrl("/login?logout=true") // 로그아웃 성공 후 리다이렉트 페이지
+                        .deleteCookies("JSESSIONID") // 로그아웃 시 쿠키 삭제
+                        .invalidateHttpSession(true) // 세션 무효화
+                        .permitAll()
                 )
                 .userDetailsService(customUserDetailsService); // UserDetailsService 설정
         return http.build();

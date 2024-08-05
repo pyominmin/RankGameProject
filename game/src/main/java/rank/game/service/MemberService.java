@@ -2,6 +2,7 @@ package rank.game.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,8 +10,15 @@ import rank.game.dto.MemberDTO;
 import rank.game.entity.MemberEntity;
 import rank.game.repository.MemberRepository;
 import rank.game.repository.VoteRepository;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -20,6 +28,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final VoteRepository voteRepository;
+
 
     // 회원가입
     public void save(MemberDTO memberDTO, String memberPassword) {
@@ -105,6 +114,7 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    //회원탈퇴
     public void deleteMember(String memberEmail) {
         Optional<MemberEntity> member = memberRepository.findByMemberEmail(memberEmail);
 
@@ -117,4 +127,36 @@ public class MemberService {
             throw new IllegalArgumentException("회원 정보를 찾을 수 없습니다.");
         }
     }
+
+    public Page<MemberDTO> findAllMembers(Pageable pageable) {
+        Page<MemberEntity> memberEntities = memberRepository.findAll(pageable);
+        return memberEntities.map(MemberDTO::fromEntity);
+    }
+
+    // 권한 변경
+    public boolean changeMemberRole(Long memberId, String newRole) {
+        Optional<MemberEntity> memberOptional = memberRepository.findById(memberId);
+        if (memberOptional.isPresent()) {
+            MemberEntity member = memberOptional.get();
+            member.setRole(newRole);
+            memberRepository.save(member);
+            return true;
+        }
+        return false;
+    }
 }
+
+    // 일반 회원 100명 생성
+//    public void createTestUsers() {
+//        List<MemberDTO> users = new ArrayList<>();
+//        for (int i = 1; i <= 100; i++) {
+//            MemberDTO userDTO = new MemberDTO();
+//            userDTO.setMemberEmail("user" + i + "@example.com");
+//            userDTO.setMemberPassword("123456789");
+//            userDTO.setMemberName("User" + i);
+//            userDTO.setNickname("user" + i);
+//            userDTO.setRole("ROLE_USER");
+//            save(userDTO, "123456789");
+//            log.info("100 test users created");
+//        }
+//    }

@@ -3,6 +3,11 @@ package rank.game.controller;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,9 +18,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import rank.game.dto.MemberDTO;
+import rank.game.entity.MemberEntity;
 import rank.game.service.MemberService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -79,6 +86,16 @@ public class MemberController {
         }
     }
 
+    @GetMapping("/logout")
+    public String logout(HttpSession session, Model model) {
+        session.invalidate();
+        model.addAttribute("isLogin", false);
+        model.addAttribute("isAdmin", false);
+        model.addAttribute("message", "로그아웃되었습니다.");
+        model.addAttribute("searchUrl", "/");
+        return "html/message";
+    }
+
     @PostMapping("/login")
     public String login(@ModelAttribute MemberDTO memberDTO, HttpSession session, Model model) {
         MemberDTO loginResult = memberService.login(memberDTO);
@@ -87,13 +104,15 @@ public class MemberController {
             session.setAttribute("loginEmail", loginResult.getMemberEmail());
             session.setAttribute("nickname", loginResult.getNickname());
             session.setAttribute("memberNum", loginResult.getNum());
-            session.setAttribute("isAdmin", loginResult.getRole().equals("ROLE_ADMIN"));
+            session.setAttribute("isAdmin", loginResult.isAdmin());
+            session.setAttribute("isManager", loginResult.isManager());
 
             log.info("로그인 성공: {}", loginResult.getMemberEmail());
-            log.info("관리자 여부: {}", loginResult.getRole().equals("ROLE_ADMIN"));
+            log.info("관리자 여부: {}", loginResult.isAdmin() || loginResult.isManager());
 
             model.addAttribute("isLogin", true);
-            model.addAttribute("isAdmin", loginResult.getRole().equals("ROLE_ADMIN"));
+            model.addAttribute("isAdmin", loginResult.isAdmin());
+            model.addAttribute("isManager", loginResult.isManager());
 
             // 현재 인증 정보를 가져옵니다.
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -111,14 +130,11 @@ public class MemberController {
             Authentication auth = new UsernamePasswordAuthenticationToken(loginResult.getMemberEmail(), null, authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-            // 인증된 사용자가 ADMIN 권한을 가지고 있는지 확인합니다.
-            boolean isAdmin = auth.getAuthorities().stream()
-                    .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
-            log.info("isAdmin: {}", isAdmin);
-
-            // 로그인 성공 후 관리자 여부에 따라 리다이렉트
-            if (isAdmin) {
-                return "html/admin"; // 관리자 페이지로 이동
+            // 인증된 사용자가 ADMIN 또는 MANAGER 권한을 가지고 있는지 확인합니다.
+            if (loginResult.isAdmin()) {
+                return "redirect:/member/admin"; // 관리자 페이지로 이동
+            } else if (loginResult.isManager()) {
+                return "redirect:/member/manager"; // 매니저 페이지로 이동
             } else {
                 return "redirect:/"; // 일반 사용자 메인 페이지로 리다이렉트
             }
@@ -128,15 +144,39 @@ public class MemberController {
         }
     }
 
-    @GetMapping("/logout")
-    public String logout(HttpSession session, Model model) {
-        session.invalidate();
-        model.addAttribute("isLogin", false);
-        model.addAttribute("isAdmin", false);
-        model.addAttribute("message", "로그아웃되었습니다.");
-        model.addAttribute("searchUrl", "/");
-        return "html/message";
+    @GetMapping("/manager")
+    public String getManagerPage(Model model, HttpSession session) {
+        boolean isLogin = session.getAttribute("loginEmail") != null;
+        model.addAttribute("isLogin", isLogin);
+
+        return "html/manager";
     }
 
-}
+    @GetMapping("/admin")
+    public String getMembersPage(Model model, HttpSession session) {
+        boolean isLogin = session.getAttribute("loginEmail") != null;
+        model.addAttribute("isLogin", isLogin);
 
+        return "html/admin";
+    }
+
+    @GetMapping("/members/page")
+    @ResponseBody
+    public Page<MemberDTO> getMembers(@RequestParam("page") int page, @RequestParam("size") int size) {
+        PageRequest pageRequest = PageRequest.of(page - 1, size);
+        return memberService.findAllMembers(pageRequest);
+    }
+
+    // 권한 변경
+    @PutMapping("/members/{memberId}/role")
+    public ResponseEntity<?> changeMemberRole(@PathVariable Long memberId, @RequestBody Map<String, String> request) {
+        String newRole = request.get("role");
+
+        boolean success = memberService.changeMemberRole(memberId, newRole);
+        if (success) {
+            return ResponseEntity.ok().body(Map.of("success", true));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "권한 변경 실패"));
+        }
+    }
+}

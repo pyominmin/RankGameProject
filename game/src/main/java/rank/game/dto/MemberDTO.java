@@ -28,5 +28,13 @@ public class MemberDTO {
         memberDTO.setRole(memberEntity.getRole()); // Role 설정 추가
         return memberDTO;
     }
+
+    public boolean isAdmin() {
+        return "ROLE_ADMIN".equals(this.role);
+    }
+
+    public boolean isManager() {
+        return "ROLE_MANAGER".equals(this.role);
+    }
 }
 
