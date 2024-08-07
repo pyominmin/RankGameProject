@@ -1802,6 +1802,7 @@ ol {
 	font-weight: bold;
 	margin: 0 10px;
 }
+
 .modal {
 	display: none;
 	position: fixed;
@@ -1813,21 +1814,27 @@ ol {
 	border-radius: 10px;
 	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 	width: 300px;
-	height: 430px;
+	height: 500px;
+	max-height: 80vh; /* 최대 높이를 설정하여 스크롤 가능하게 합니다 */
+	overflow-y: auto; /* 수직 스크롤을 추가합니다 */
 	z-index: 1001;
 }
+
 .modal.active {
 	display: block;
 }
+
 .modal h2 {
 	margin: 0 0 20px 0;
 	color: #4b0082;
 }
+
 .modal label {
 	display: block;
 	margin: 10px 0 5px;
 	color: #4b0082;
 }
+
 .modal input {
 	width: 100%;
 	padding: 10px;
@@ -1835,6 +1842,7 @@ ol {
 	border: 1px solid #ccc;
 	border-radius: 5px;
 }
+
 .modal button {
 	width: 100%;
 	padding: 10px;
@@ -1846,9 +1854,11 @@ ol {
 	font-size: 16px;
 	margin-top: 10px;
 }
+
 .modal button:hover {
 	background-color: #36005a;
 }
+
 .modal-overlay {
 	display: none;
 	position: fixed;
@@ -1859,8 +1869,15 @@ ol {
 	background-color: rgba(0, 0, 0, 0.5);
 	z-index: 1000;
 }
+
 .modal-overlay.active {
 	display: block;
+}
+
+.modal-content {
+	max-height: 70vh; /* 모달의 최대 높이를 설정 */
+	overflow-y: auto; /* 수직 스크롤을 추가 */
+	padding-right: 10px; /* 스크롤바 공간 확보를 위해 패딩 추가 */
 }
 
 /* 회원가입 */
@@ -1874,6 +1891,7 @@ ol {
 	left: 50%;
 	transform: translate(-50%);
 	width: 460px;
+
 }
 
 .newsletter-section .container {

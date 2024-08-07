@@ -1,14 +1,21 @@
 package rank.game.controller;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,10 +24,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 import rank.game.dto.MemberDTO;
 import rank.game.entity.MemberEntity;
 import rank.game.service.MemberService;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,6 +39,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RequestMapping("/member")
 public class MemberController {
+
+    @Autowired
+    private JavaMailSender mailSender;
 
     private final MemberService memberService;
 
@@ -178,5 +191,58 @@ public class MemberController {
         } else {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "권한 변경 실패"));
         }
+    }
+
+    //이메일 전송
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity<Map<String, Object>> resetPassword(@RequestParam("memberEmail") String memberEmail) {
+        Map<String, Object> response = new HashMap<>();
+        System.out.println("Received email for resetPassword: " + memberEmail); // 로그 추가
+        String temporaryPassword = UUID.randomUUID().toString().substring(0, 8);
+        memberService.updatePassword(memberEmail, temporaryPassword);
+
+        try {
+            memberService.sendPasswordResetEmail(memberEmail, temporaryPassword);
+            response.put("success", true);
+        } catch (MessagingException e) {
+            log.error("Error sending email: ", e);
+            response.put("success", false);
+            response.put("message", "Failed to send email");
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/checkEmail")
+    public ResponseEntity<Boolean> checkEmailExists(@RequestParam("memberEmail") String memberEmail) {
+        boolean exists = memberService.emailExists(memberEmail);
+        return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/mailInjeung")
+    public ResponseEntity<String> sendVerificationCode(@RequestParam("memberEmail") String memberEmail) throws IOException {
+        System.out.println("Received email: " + memberEmail); // 로그 추가
+        try {
+            String verificationCode = memberService.sendMail(memberEmail);
+            return ResponseEntity.ok(verificationCode);
+        } catch (MessagingException e) {
+            log.error("Error sending email: ", e);
+            return ResponseEntity.status(500).body("Failed to send email");
+        }
+    }
+
+    @PostMapping("/sendVerificationCode")
+    public ModelAndView sendVerification(@RequestParam("memberEmail") String memberEmail) {
+        ModelAndView modelAndView = new ModelAndView();
+        try {
+            String verificationCode = memberService.sendMail(memberEmail);
+            modelAndView.addObject("verificationCode", verificationCode);
+            modelAndView.setView(new RedirectView("/")); // 성공 시 index 페이지로 리다이렉트
+        } catch (MessagingException e) {
+            log.error("Error sending email: ", e);
+            modelAndView.addObject("message", "Failed to send email");
+            modelAndView.setViewName("html/error"); // 실패 시 에러 페이지로 리다이렉트
+        }
+        return modelAndView;
     }
 }

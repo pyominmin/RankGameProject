@@ -547,3 +547,90 @@ document.addEventListener('DOMContentLoaded', (event) => {
 		});
 	});
 });
+
+document.addEventListener("DOMContentLoaded", function() {
+	const loginBtn = document.getElementById("login-btn");
+	const closeLoginModalBtn = document.getElementById("close-login-modal");
+	const forgotPasswordBtn = document.getElementById("forgot-password-btn");
+	const closeForgotPasswordModalBtn = document.getElementById("close-forgot-password-modal");
+
+	const loginModal = document.getElementById("login-modal");
+	const forgotPasswordModal = document.getElementById("forgot-password-modal");
+	const modalOverlay = document.getElementById("modal-overlay");
+
+	if (loginBtn) {
+		loginBtn.addEventListener("click", function() {
+			loginModal.classList.add("active");
+			modalOverlay.classList.add("active");
+		});
+	}
+
+	if (closeLoginModalBtn) {
+		closeLoginModalBtn.addEventListener("click", function() {
+			loginModal.classList.remove("active");
+			modalOverlay.classList.remove("active");
+		});
+	}
+
+	if (forgotPasswordBtn) {
+		forgotPasswordBtn.addEventListener("click", function() {
+			loginModal.classList.remove("active");
+			forgotPasswordModal.classList.add("active");
+			modalOverlay.classList.add("active");
+		});
+	}
+
+	if (closeForgotPasswordModalBtn) {
+		closeForgotPasswordModalBtn.addEventListener("click", function() {
+			forgotPasswordModal.classList.remove("active");
+			modalOverlay.classList.remove("active");
+		});
+	}
+
+	if (modalOverlay) {
+		modalOverlay.addEventListener("click", function() {
+			loginModal.classList.remove("active");
+			forgotPasswordModal.classList.remove("active");
+			modalOverlay.classList.remove("active");
+		});
+	}
+
+	const emailCheckBtn = document.getElementById('emailCheckBtn');
+	const injeungCheckBtn = document.getElementById('injeungCheckBtn');
+	const findPwdBtn = document.getElementById('findPwdBtn');
+
+	let check_email = false;
+
+	emailCheckBtn.addEventListener("click", function(){
+		const mbEmail = document.getElementById('mbEmail').value;
+		const emailCheckWarn = document.getElementById('emailCheckWarn');
+
+		$.ajax({
+			url: "/checkNameEmail.dw", // 해당 URL을 이메일 확인 URL로 변경하세요.
+			data: {"mbEmail": mbEmail},
+			success: (data) => {
+				if(data === 'true') {
+					$.ajax({
+						url: "/mailInjeung.dw",
+						data: {"mbEmail": mbEmail},
+						success: (data) => {
+							emailCheckWarn.innerText = '인증번호가 발송되었습니다.';
+							emailCheckWarn.style.color = "black";
+							document.getElementById('injeungbunho').value = data;
+						},
+						error: (error) => {
+							emailCheckWarn.innerText = '인증번호 발송에 실패하였습니다.';
+							emailCheckWarn.style.color = "red";
+						}
+					});
+				} else {
+					emailCheckWarn.innerText = "이메일 주소를 다시 확인해주세요.";
+					emailCheckWarn.style.color = "red";
+				}
+			},
+			error: (error) => {
+				console.log(error);
+			}
+		});
+	});
+});

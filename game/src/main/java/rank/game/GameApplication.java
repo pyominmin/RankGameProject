@@ -26,7 +26,7 @@ public class GameApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		memberService.createAdminAccount();
-		//memberService.createTestUsers();
+
 	}
 
 

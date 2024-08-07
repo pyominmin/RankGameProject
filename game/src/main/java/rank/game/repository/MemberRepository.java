@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import rank.game.entity.MemberEntity;
 
 import java.awt.print.Pageable;
+import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,5 +22,4 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
     boolean existsByMemberEmail(String memberEmail);
     boolean existsByNickname(String nickname);
     Optional<MemberEntity> findByMemberEmail(String memberEmail);
-
 }

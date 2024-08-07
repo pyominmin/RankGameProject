@@ -1,8 +1,14 @@
 package rank.game.service;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.*;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,10 +19,8 @@ import rank.game.repository.VoteRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.lang.reflect.Member;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -28,6 +32,12 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final VoteRepository voteRepository;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
+
+    private static String number;
+    private final String senderEmail = "myoping99@gmail.com";
 
 
     // 회원가입
@@ -144,19 +154,80 @@ public class MemberService {
         }
         return false;
     }
-}
 
-    // 일반 회원 100명 생성
-//    public void createTestUsers() {
-//        List<MemberDTO> users = new ArrayList<>();
-//        for (int i = 1; i <= 100; i++) {
-//            MemberDTO userDTO = new MemberDTO();
-//            userDTO.setMemberEmail("user" + i + "@example.com");
-//            userDTO.setMemberPassword("123456789");
-//            userDTO.setMemberName("User" + i);
-//            userDTO.setNickname("user" + i);
-//            userDTO.setRole("ROLE_USER");
-//            save(userDTO, "123456789");
-//            log.info("100 test users created");
-//        }
-//    }
+    //메일 전송
+    public void updatePassword(String memberEmail, String temporaryPassword) {
+        MemberEntity member = memberRepository.findByMemberEmail(memberEmail)
+                .orElseThrow(() -> new IllegalArgumentException("No member found with email: " + memberEmail));
+        member.setMemberPassword(passwordEncoder.encode(temporaryPassword));
+        memberRepository.save(member);
+    }
+
+    public MimeMessage createMessage(String email, String subject, String content) throws MessagingException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+        messageHelper.setFrom(senderEmail);
+        messageHelper.setTo(email);
+        messageHelper.setSubject(subject);
+        messageHelper.setText(content, true);
+
+        return mimeMessage;
+    }
+
+    public void sendPasswordResetEmail(String email, String temporaryPassword) throws MessagingException {
+        String subject = "RankGame 임시 비밀번호 안내";
+        String content = "고객님의 임시 비밀번호는 " + temporaryPassword + " 입니다. 로그인 후 비밀번호를 변경해 주세요.";
+        MimeMessage mimeMessage = createMessage(email, subject, content);
+        javaMailSender.send(mimeMessage);
+    }
+
+    public static String createNumber() {
+        Random random = new Random();
+        StringBuffer key = new StringBuffer();
+
+        for (int i = 0; i < 8; i++) { // 총 8자리 인증 번호 생성
+            int idx = random.nextInt(3); // 0~2 사이의 값을 랜덤하게 받아와 idx에 집어넣습니다
+
+            // 0,1,2 값을 switch case를 통해 꼬아버립니다.
+            // 숫자와 ASCII 코드를 이용합니다.
+            switch (idx) {
+                case 0:
+                    // 0일 때, a~z 까지 랜덤 생성 후 key에 추가
+                    key.append((char) (random.nextInt(26) + 97));
+                    break;
+                case 1:
+                    // 1일 때, A~Z 까지 랜덤 생성 후 key에 추가
+                    key.append((char) (random.nextInt(26) + 65));
+                    break;
+                case 2:
+                    // 2일 때, 0~9 까지 랜덤 생성 후 key에 추가
+                    key.append(random.nextInt(10));
+                    break;
+            }
+        }
+        return key.toString();
+    }
+
+    public String sendMail(String email) throws MessagingException {
+        String number = createNumber();
+        log.info("Number : {}", number);
+
+        String subject = "[RankGame] 이메일 인증 번호 발송";
+        String content = "<html><body style='background-color: #000000 !important; margin: 0 auto; max-width: 600px; word-break: break-all; padding-top: 50px; color: #ffffff;'>";
+        content += "<h1 style='padding-top: 50px; font-size: 30px;'>이메일 주소 인증</h1>";
+        content += "<p style='padding-top: 20px; font-size: 18px; opacity: 0.6; line-height: 30px; font-weight: 400;'>안녕하세요? RankGame 관리자 입니다.<br />";
+        content += "RankGame 서비스 사용을 위해 회원가입시 고객님께서 입력하신 이메일 주소의 인증이 필요합니다.<br />";
+        content += "하단의 인증 번호로 이메일 인증을 완료하시면, 정상적으로 RankGame 서비스를 이용하실 수 있습니다.<br />";
+        content += "항상 최선의 노력을 다하는 RankGame이 되겠습니다.<br />";
+        content += "감사합니다.</p>";
+        content += "<div class='code-box' style='margin-top: 50px; padding-top: 20px; color: #000000; padding-bottom: 20px; font-size: 25px; text-align: center; background-color: #f4f4f4; border-radius: 10px;'>" + number + "</div>";
+        content += "</body></html>";
+
+        MimeMessage mimeMessage = createMessage(email, subject, content);
+        javaMailSender.send(mimeMessage);
+        log.info("[Mail 전송 완료]");
+
+        return number;
+    }
+}

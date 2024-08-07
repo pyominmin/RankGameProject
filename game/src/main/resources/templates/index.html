@@ -77,7 +77,36 @@
 							<button type="submit">로그인</button>
 						</form>
 						<button id="close-login-modal">닫기</button>
+						<button id="forgot-password-btn">비밀번호 찾기</button>
 					</div>
+
+					<div class="modal" id="forgot-password-modal" th:if="${!isLogin}">
+						<div class="modal-content" style="max-height: 70vh; overflow-y: auto;">
+							<h3>비밀번호 찾기</h3>
+							<form action="/member/resetPassword" method="POST" id="formId">
+								<div class="mb-3">
+									<label for="memberEmail">이메일</label>
+									<div class="d-flex justify-content-between">
+										<input type="email" name="memberEmail" id="memberEmail" placeholder="가입하신 이메일 주소" style="flex-grow: 1;">
+										<button type="button" id="emailCheckBtn" class="btn btn-outline-dark mb-3 btn-sm" style="margin-left: 10px;">전송</button>
+									</div>
+									<div class="form-text" id="emailCheckWarn"></div>
+								</div>
+								<div class="mb-3">
+									<label for="injeung">인증번호 입력</label>
+									<div class="d-flex justify-content-between">
+										<input type="hidden" id="injeungbunho">
+										<input type="text" id="injeung" style="flex-grow: 1;">
+									</div>
+									<div class="form-text" id="injeungCheckWarn"></div>
+								</div>
+								<button type="button" class="btn btn-dark mb-3" id="findPwdBtn" style="width: 100%;">확인</button>
+								<input type="hidden" id="randomPwd">
+							</form>
+							<button id="close-forgot-password-modal">닫기</button>
+						</div>
+					</div>
+
 					<!-- Menu -->
 					<ul class="main-menu primary-menu">
 						<li><a href="/">홈</a></li>
@@ -212,6 +241,84 @@
 	<script src="/js/jquery.sticky-sidebar.min.js"></script>
 	<script src="/js/jquery.magnific-popup.min.js"></script>
 	<script src="/js/main.js"></script>
+<script>
 
+	document.addEventListener("DOMContentLoaded", function() {
+		const emailCheckBtn = document.getElementById('emailCheckBtn');
+		const findPwdBtn = document.getElementById('findPwdBtn');
+
+		emailCheckBtn.addEventListener("click", function() {
+			const memberEmail = document.getElementById('memberEmail').value;
+			const emailCheckWarn = document.getElementById('emailCheckWarn');
+
+			// 이메일 존재 여부 확인
+			$.post("/member/checkEmail", { memberEmail: memberEmail }, function(data) {
+				if (data) {
+					// 인증번호 발송
+					$.get("/member/mailInjeung", { memberEmail: memberEmail }, function(data) {
+						emailCheckWarn.style.color = "black";
+						document.getElementById('injeungbunho').value = data;
+						alert("인증번호가 전송되었습니다.");
+					}).fail(function() {
+						emailCheckWarn.innerText = '인증번호 발송에 실패하였습니다.';
+						emailCheckWarn.style.color = "red";
+					});
+				} else {
+					emailCheckWarn.innerText = "등록되지 않은 이메일입니다.";
+					emailCheckWarn.style.color = "red";
+				}
+			}).fail(function() {
+				emailCheckWarn.innerText = "서버 오류가 발생하였습니다.";
+				emailCheckWarn.style.color = "red";
+			});
+		});
+
+		findPwdBtn.addEventListener("click", function() {
+			const injeungbunho = document.getElementById('injeungbunho').value;
+			const injeung = document.getElementById('injeung').value;
+			const memberEmail = document.getElementById('memberEmail').value;
+			const injeungCheckWarn = document.getElementById('injeungCheckWarn');
+			const formId = document.getElementById('formId');
+
+			let check_email = false;
+
+			if (injeungbunho === "") {
+				injeungCheckWarn.innerText = "인증을 진행해주세요.";
+				injeungCheckWarn.style.color = "red";
+				check_email = false;
+			} else if (injeung === "") {
+				injeungCheckWarn.innerText = "인증번호를 입력해주세요.";
+				injeungCheckWarn.style.color = "red";
+				check_email = false;
+			} else if (injeung !== injeungbunho) {
+				injeungCheckWarn.innerText = "인증번호가 일치하지 않습니다.";
+				injeungCheckWarn.style.color = "red";
+				check_email = false;
+			} else {
+				injeungCheckWarn.innerText = "인증번호가 일치합니다.";
+				injeungCheckWarn.style.color = "black";
+				check_email = true;
+			}
+
+			if (!check_email) {
+				alert("이메일 인증을 완료해주세요!");
+			} else {
+				findPwdBtn.disabled = true; // 버튼 비활성화
+				$.post("/member/resetPassword", { memberEmail: memberEmail }, function(data) {
+					if (data.success) {
+						alert("임시 비밀번호가 이메일로 전송되었습니다.");
+						window.location.href = "/"; // 메인화면으로 리다이렉트
+					} else {
+						alert("비밀번호 재설정에 실패하였습니다.");
+					}
+					findPwdBtn.disabled = false; // 버튼 활성화
+				}).fail(function() {
+					alert("서버 오류가 발생하였습니다.");
+					findPwdBtn.disabled = false; // 버튼 활성화
+				});
+			}
+		}, { once: true }); // 이벤트 리스너를 한 번만 실행
+	});
+</script>
 	</body>
 </html>
