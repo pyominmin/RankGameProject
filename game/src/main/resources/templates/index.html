@@ -58,7 +58,6 @@
 						<div class="auth" th:if="${isLogin}">
 							<a href="/profile/mainMyPage">마이페이지</a> /
 							<a href="/member/logout">로그아웃</a>
-							<span th:if="${isAdmin}"><a href="/member/members">관리자 페이지</a></span>
 						</div>
 						<div class="auth" th:if="${!isLogin}">
 							<a href="#" id="login-btn">로그인</a> / <a href="/member/signup">회원가입</a>
@@ -119,12 +118,29 @@
 						</li>
 						<li><a href="/review">투표 / 게임 랭킹</a>
 							<ul class="sub-menu">
-								<li><a href="/review">게임 랭킹</a>
+								<li><a href="/review">게임 랭킹</a></li>
 								<li><a href="/vote">투표</a></li>
 							</ul>
 						</li>
 						<li><a href="/board/boardlist">자유게시판</a></li>
 						<li><a href="/notice">공지사항</a></li>
+						<!-- 관리자 페이지 메뉴 -->
+						<li th:if="${isAdmin}">
+							<a href="#">관리자 페이지</a>
+							<ul class="sub-menu">
+								<li><a href="/admin/member">회원관리</a></li>
+								<li><a href="/admin/notices">공지사항 관리</a></li>
+								<li><a href="/admin/posts">게시글 관리</a></li>
+							</ul>
+						</li>
+						<li th:if="${isManager}">
+							<a href="#">관리자 페이지</a>
+							<ul class="sub-menu">
+								<li><a href="/manager/members">회원관리</a></li>
+								<li><a href="/admin/notices">공지사항 관리</a></li>
+								<li><a href="/admin/posts">게시글 관리</a></li>
+							</ul>
+						</li>
 					</ul>
 				</nav>
 			</div>

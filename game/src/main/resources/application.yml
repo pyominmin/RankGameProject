@@ -18,7 +18,7 @@ spring:
             enable: true
         transport:
           protocol: smtp
-        debug: true
+
 
   mvc:
     static-path-pattern: /uploads/**
@@ -75,7 +75,7 @@ pubg:
     key: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJjZDFhOWE4MC0xZmNlLTAxM2QtZGIzZS0yYWNhNmM1NWIyYzAiLCJpc3MiOiJnYW1lbG9ja2VyIiwiaWF0IjoxNzIwNDk0NjY0LCJwdWIiOiJibHVlaG9sZSIsInRpdGxlIjoicHViZyIsImFwcCI6ImdhbWVyYW5rIn0.TwVaNy84Xcmdobi-WZ8OTzptnW2piSW6xak55_I--GM
 
 
-logging:
-  level:
-    org.springframework.web: DEBUG
-    org.hibernate: DEBUG
+#logging:
+#  level:
+#    org.springframework.web: DEBUG
+#    org.hibernate: DEBUG

@@ -1,6 +1,7 @@
 package rank.game.config;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -12,12 +13,15 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import rank.game.service.CustomUserDetailsService;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -25,6 +29,8 @@ import rank.game.service.CustomUserDetailsService;
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
+
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -44,25 +50,20 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // CSRF 보호 비활성화
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/admin/**").hasAnyRole("ADMIN", "MANAGER") // ADMIN 또는 MANAGER 권한 필요
+//                        .requestMatchers("/admin/**").hasAnyRole("ADMIN") // ADMIN 또는 MANAGER 권한 필요
                         .anyRequest().permitAll() // 나머지 요청은 모두 허용
                 )
-                .formLogin(form -> form
-                        .loginPage("/login") // 사용자 정의 로그인 페이지
-                        .defaultSuccessUrl("/", true) // 로그인 성공 후 리다이렉트 페이지
-                        .failureUrl("/login?error=true") // 로그인 실패 후 리다이렉트 페이지
-                        .permitAll()
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            log.error("Access Denied: {}", accessDeniedException.getMessage());
+                            response.sendRedirect("/403");
+                        })
                 )
-                .logout(logout -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                        .logoutSuccessUrl("/login?logout=true") // 로그아웃 성공 후 리다이렉트 페이지
-                        .deleteCookies("JSESSIONID") // 로그아웃 시 쿠키 삭제
-                        .invalidateHttpSession(true) // 세션 무효화
-                        .permitAll()
-                )
-                .userDetailsService(customUserDetailsService); // UserDetailsService 설정
+                .userDetailsService(customUserDetailsService);
+
         return http.build();
     }
+
 
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
